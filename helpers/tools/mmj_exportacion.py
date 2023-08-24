@@ -136,9 +136,7 @@ def extract_from_pdf(filename):
             data_pieces_clean.append(result_clean)
             data_pieces.append(result)
         except:
-            if len(tables_middle[idx].index) < 3:
-                print(f"page ommited: {idx+1}")
-                continue
+            
             try:
                 result_clean, result = clean_columns(tables_middle[idx])
                 data_pieces_clean.append(result_clean)
@@ -151,6 +149,14 @@ def extract_from_pdf(filename):
     pieces_clean = pd.concat(data_pieces_clean)
     pieces = pd.concat(data_pieces)  
     return pieces_clean, pieces
+def remove_commas_from_numbers(df):
+    for col in df.columns:
+        # Verifica si la columna es de tipo objeto, lo cual es probable para las cadenas
+        if df[col].dtype == 'object':
+            # Reemplaza las comas y convierte a float
+            df[col] = df[col].str.replace(',', '').astype(float, errors='ignore')  # ignore los errores para mantener las cadenas no numéricas como están
+    return df
+
 
 def extract_data_mmj_export(filename):
     pieces_clean, pieces = extract_from_pdf(filename)
@@ -158,9 +164,8 @@ def extract_data_mmj_export(filename):
     pieces_clean = separate_brutos_netos(pieces_clean)
     pieces_clean = separate_materia_prima(pieces_clean)
     total=(pieces_clean['total'].str.replace(',','').astype(float).sum())
-
+    pieces_clean=remove_commas_from_numbers(pieces_clean)
     costperunit = total/float(pieces_clean['cantidad'].iloc[0])
-    
     #give format to the data
     costperunit = "{:.2f}".format(costperunit)
     costperunit = total/float(pieces_clean['cantidad'].iloc[0])
@@ -173,5 +178,4 @@ def extract_data_mmj_export(filename):
         print(row['total'])
         insert_item(Quantity_items=str(row['cantidad']),Mesure_items=str(row['umc']),Description_items=str(row['descripcion']),Cost_items=costperunit)
   
-
 

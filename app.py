@@ -5,7 +5,7 @@ import utils as utils
 from helpers import selector
 from pathlib import Path
 from db_custom import getlastidInvoices, insert_invoice,insert_item, multiplyItems
-from datetime import date
+import datetime
 import logging
 import ia 
 import tools.RelugarExpretions as RelugarExpretions
@@ -51,8 +51,7 @@ def extract_type(text):
     
     return typepdf
 
-logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-logging.disable(logging.INFO)
+
 
 for pdf in pdfs:
     id_pdfs=pdf.id_pdfs
@@ -80,9 +79,10 @@ for pdf in pdfs:
                                 print("No existe el cliente")
                                 pass
                             if not datelist:
-                                date=date.today()
+                                date=datetime.datetime.today()
                             else:
                                 date=datelist[0]
+                                date=str(date)
                             insert_invoice(RFC_clients=rfc,Date_invoices=date,Total_invoives=0,Origin_invoices=getName(rfc))  
                             selector.selectorTemplate(RFC=rfc,TYPE=typepdf,PATH=path_pdfs)
                             multiplyItems(getlastidInvoices())

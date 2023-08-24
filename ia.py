@@ -44,7 +44,8 @@ def extract_type(path,text):
                         for i in range(len(table)):
                             table[i] = table_utils.clean_table(table[i])
                             table[i].to_excel(path, sheet_name='number_{}'.format(i))
-                            db_custom.insert_invoice(RFC_clients="IA",Date_invoices=datetime.today(),Total_invoives=0,Origin_invoices=path)
+                            date=datetime.datetime.today()
+                            db_custom.insert_invoice(RFC_clients="IA",Date_invoices=str(date),Total_invoives=0,Origin_invoices=path)
 
                         return "unknown"   
     except Exception as e:
